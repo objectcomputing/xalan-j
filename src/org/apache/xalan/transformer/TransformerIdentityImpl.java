@@ -439,13 +439,11 @@ public class TransformerIdentityImpl extends Transformer
           } catch (SAXException se) {
             throw new TransformerException(se);
           }
-        } else {
-          try {
-            reader.setFeature("http://xml.org/sax/features/namespace-prefixes",
-                              true);
-          } catch (org.xml.sax.SAXException se) {
-            // We don't care.
-          }
+        }
+        try {
+          reader.setFeature("http://xml.org/sax/features/namespace-prefixes", true);
+        } catch (org.xml.sax.SAXException se) {
+          // We don't care.
         }
 
         // Get the input content handler, which will handle the 
