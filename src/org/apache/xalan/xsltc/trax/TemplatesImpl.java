@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.net.URL;
+import java.util.Enumeration;
 import java.util.Properties;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -116,18 +118,49 @@ public final class TemplatesImpl implements Templates, Serializable {
      */
     private transient TransformerFactoryImpl _tfactory = null;
 
-    static final class TransletClassLoader extends ClassLoader {
-	TransletClassLoader(ClassLoader parent) {
-	    super(parent);
-	}
+	/**
+	 * A class loader that simulates a traditional parent-first model when ran
+	 * in modular class loading environments that do not intermix framework and
+	 * user provided classes. This approach is also compatible in a traditional
+	 * hierarchical environment.
+	 * 
+	 * This is necessary because Translets expect to see xsltc classes and user
+	 * classes on the same class loader. If in the future they are evolved to
+	 * separate user class loading from internal xsltc class references then
+	 * this class loader is no longer necessary.
+	 */
+	static final class TransletClassLoader extends ClassLoader {
+		private final static ClassLoader frameworkLoader = TransletClassLoader.class.getClassLoader();
+		private final ClassLoader ctx;
 
-        /**
-         * Access to final protected superclass member from outer class.
-         */
-	Class defineClass(final byte[] b) {
-            return defineClass(null, b, 0, b.length);
+		TransletClassLoader() {
+			super(TransletClassLoader.class.getClassLoader());
+			ClassLoader loader = SecuritySupport.getInstance().getContextClassLoader();
+			
+			// Don't bother delegating if the framework loader is the TCCL
+			ctx = frameworkLoader == loader ? null : loader;
+		}
+
+		protected Class<?> findClass(String name) throws ClassNotFoundException {
+			return ctx == null ? null : ctx.loadClass(name);
+		}
+
+		protected URL findResource(String name) {
+			return ctx == null ? null : ctx.getResource(name);
+		}
+
+		protected Enumeration<URL> findResources(String name)
+				throws IOException {
+			return ctx == null ? null : ctx.getResources(name);
+		}
+
+		/**
+		 * Access to final protected superclass member from outer class.
+		 */
+		Class defineClass(final byte[] b) {
+			return defineClass(null, b, 0, b.length);
+		}
 	}
-    }
 
 
     /**
@@ -283,7 +316,7 @@ public final class TemplatesImpl implements Templates, Serializable {
         TransletClassLoader loader = (TransletClassLoader)
             AccessController.doPrivileged(new PrivilegedAction() {
                 public Object run() {
-                    return new TransletClassLoader(ObjectFactory.findClassLoader());
+                    return new TransletClassLoader();
                 }
             });
 
