@@ -701,6 +701,15 @@ $Id$
        </patternset>
     </jar>  
  
+    <!-- Generate Maven style sources jar named xalan.jar -->
+    <jar jarfile="${build.dir}/xalan-sources.jar" manifest="${build.dir}/MANIFEST.MF"
+         basedir="${src.dir}" >
+       <patternset>
+         <exclude name="${xsltc.reldir}/util/JavaCupRedirect*" />
+         <exclude name="${serializer.reldir}/**/*" />
+       </patternset>
+    </jar>  
+ 
   </target>
   
   <!-- =================================================================== -->
@@ -1628,6 +1637,14 @@ $Id$
     <jar jarfile="${build.serializer.jar}"
       manifest="${serializer.build.dir}/${serializer.manifest.basename}"
       basedir="${serializer.build.classes}" >
+      <patternset><!-- relative to jar/@basedir -->
+        <include name="${serializer.reldir}/**/*" />
+      </patternset>
+    </jar>
+    <!-- Generate a Maven style java sources jar -->
+    <jar jarfile="${build.dir}/serializer-sources.jar"
+      manifest="${serializer.build.dir}/${serializer.manifest.basename}"
+      basedir="${src.dir}" >
       <patternset><!-- relative to jar/@basedir -->
         <include name="${serializer.reldir}/**/*" />
       </patternset>
