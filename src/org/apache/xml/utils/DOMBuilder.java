@@ -67,6 +67,9 @@ public class DOMBuilder
   
   /** Namespace support */
   protected Vector m_prefixMappings = new Vector();
+
+  /** Used to build text nodes efficiently */
+  private StringBuffer m_textBuffer = new StringBuffer();
   
   /**
    * DOMBuilder instance constructor... it will add the DOM nodes
@@ -319,7 +322,7 @@ public class DOMBuilder
           String ns, String localName, String name, Attributes atts)
             throws org.xml.sax.SAXException
   {
-
+    appendTextNode();
     Element elem;
 
 	// Note that the namespace-aware call must be used to correctly
@@ -425,6 +428,7 @@ public class DOMBuilder
   public void endElement(String ns, String localName, String name)
           throws org.xml.sax.SAXException
   {
+    appendTextNode();
     m_elemStack.pop();
     m_currentNode = m_elemStack.isEmpty() ? null : (Node)m_elemStack.peek();
   }
@@ -477,16 +481,16 @@ public class DOMBuilder
       return;
     }
 
-    String s = new String(ch, start, length);
-    Node childNode;
-    childNode =  m_currentNode != null ? m_currentNode.getLastChild(): null;
-    if( childNode != null && childNode.getNodeType() == Node.TEXT_NODE ){
-       ((Text)childNode).appendData(s);
-    }
-    else{
-       Text text = m_doc.createTextNode(s);
+    m_textBuffer.append(ch, start, length);
+  }
+
+  private void appendTextNode() throws org.xml.sax.SAXException
+  {
+     if(m_textBuffer.length() > 0){
+       Text text = m_doc.createTextNode(m_textBuffer.toString());
        append(text);
-    }
+       m_textBuffer.setLength(0);
+     }
   }
 
   /**
@@ -614,6 +618,7 @@ public class DOMBuilder
   public void processingInstruction(String target, String data)
           throws org.xml.sax.SAXException
   {
+    appendTextNode();
     append(m_doc.createProcessingInstruction(target, data));
   }
 
@@ -630,6 +635,7 @@ public class DOMBuilder
    */
   public void comment(char ch[], int start, int length) throws org.xml.sax.SAXException
   {
+    appendTextNode();
     append(m_doc.createComment(new String(ch, start, length)));
   }
 
