@@ -16,6 +16,10 @@
  * limitations under the License.
  */
 /*
+ * OCI post 2.7.1 Authors:
+ *   Brian Johnson <johnsonb@ociweb.com>
+ */
+/*
  * $Id$
  */
 package org.apache.xalan.processor;
@@ -335,6 +339,10 @@ public class TransformerFactoryImpl extends SAXTransformerFactory
           reader = XMLReaderFactory.createXMLReader();
         }
 
+        if(m_isSecureProcessing)
+        {
+          reader.setFeature("http://xml.org/sax/features/external-general-entities",false);
+        }
         // Need to set options!
         reader.setContentHandler(handler);
         reader.parse(isource);
