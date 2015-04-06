@@ -54,6 +54,7 @@ Other Important Notes:
 Authors:
   Shane Curcuru <shane_curcuru@lotus.com>
   Don Leslie <donald_leslie@lotus.com>
+  Brian Johnson <johnsonb@ociweb.com>
 
 $Id$
 ==================================================================== -->
@@ -69,8 +70,10 @@ $Id$
   <property name="version.RELEASE"        value="7"/>
   <property name="version.DEVELOPER"      value=""/><!-- Set this to 'D' if a developer release; blank "" if maintenance release -->
   <property name="version.MINOR"          value="1"/><!-- EITHER the developer release number, or a maintenance release number -->
-  <property name="version"                value="${version.VERSION}_${version.RELEASE}_${version.DEVELOPER}${version.MINOR}"/><!-- GUMP: version # of dist file -->
-  <property name="impl.version"           value="${version.VERSION}.${version.RELEASE}.${version.DEVELOPER}${version.MINOR}"/><!-- Used in jar task for filtering MANIFEST.MF file -->
+  <property name="version.VENDOR"         value="OCI"/>
+  <property name="version.PATCH"          value=""/><!-- the OCI patch level -->
+  <property name="version"                value="${version.VERSION}_${version.RELEASE}_${version.DEVELOPER}${version.MINOR}_${version.VENDOR}${version.PATCH}"/><!-- GUMP: version # of dist file -->
+  <property name="impl.version"           value="${version.VERSION}.${version.RELEASE}.${version.DEVELOPER}${version.MINOR}.${version.VENDOR}${version.PATCH}"/><!-- Used in jar task for filtering MANIFEST.MF file -->
   
   <!-- Xerces Java version information -->
   <property name="parser.version.VERSION" value="2"/>
@@ -329,6 +332,8 @@ $Id$
     <filter token="version.RELEASE"          value="${version.RELEASE}"/>
     <filter token="version.MINOR"            value="${version.MINOR}"/>
     <filter token="version.DEVELOPER"        value="${version.DEVELOPER}"/> 
+    <filter token="version.VENDOR"           value="${version.VENDOR}"/> 
+    <filter token="version.PATCH"            value="${version.PATCH}"/> 
     <filter token="parser.version.VERSION"   value="${parser.version.VERSION}"/>  
     <filter token="parser.version.RELEASE"   value="${parser.version.RELEASE}"/>
     <filter token="parser.version.MINOR"     value="${parser.version.MINOR}"/>    
